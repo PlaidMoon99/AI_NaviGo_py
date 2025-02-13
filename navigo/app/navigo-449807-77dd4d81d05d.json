@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "navigo-449807",
+  "private_key_id": "77dd4d81d05d4dbcf6434eac84c10fb5196f394c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDEyEBt1N2vvKHm\n/ahhv03JnMzLOgKspNeXdFOlufGe69KphpFCPAmDfbWYlISfARNEzN/rwTy6IaIh\nwkxgtgg9n0c9Wc+uQTL3nRI0n2ZzssR8DUfcI3IYhVCAstv1f/byiztVz8lC0cq2\nOHtU6FLNyzbl0BG1t0RAOUJAuR8WLU5FTJBFyfU+q+ZOOqHBtbZ4aZ35Zl5ZSmeY\ncRBQScMcXh+YhZ5Czd81xsXPmwWYnnmp9Qb8qnDpjpdCLqve4kfpPpVrUWtMSh+i\nGxDpt/h30P8ealWRLb7NtjkdYI+bUy+R0SwNnMS1td96iVH6vusm78hPPQTSKV3d\nyol54TnhAgMBAAECggEAApLw/s7KQI552qzmOzMWqCS4LA9b8his5kMEBhau0aqZ\nhJSpSUHCSRlHmxGUQ4Uu1JdOdYW/Ttr6RTFGsPwoku/GrYeDdy7MpR8FmjEclLZZ\nqhq9XiSLjUUPJsPQKz+rggQuuEJhylE2stf9ywBH9v+pvetRE/yr9KAbHQAe5zoW\nGK9cBpu5ixIWYSOO994bE3wCeEV2Izsz1PLFOPgPOrwa4ZU3zY5iTHSrmL6c2Wlr\n7ON6xmcq3C6GLDXYott/mGqsPgSVvjxqezo3npO4oa1g1SlNdv1FJxzWNZjTZQBC\nO1lR5mqNShfgFI7cCYkcCbblcn1vPjddjg15g6HhQQKBgQDySj7z+8s76MdoP0Gf\n7thW+pgFZRcKlK4YzzfzzGmkH0GTCWLWqr2oG87UtYRKvg54Tig2HOb0tMDOvbJR\nDqmYpHqo2y2r+aTAO0QaM3ztibW8fGAVVlVJaQFx4UKHZZT86dtlRw1KF9pNdEgk\nws3rYcZdfIMD60YvH2N+r32isQKBgQDP6sqBWO0iXWTX4NpdmYF8lLaCUnuNMlR3\n86wuldu7TtYJtA/GsN5QFbjqVWD8ZUUF+CkxXc1pI5ezPqzth2Ps4uJWOIsk/CUy\nHdcViDby67bq+TMNAJ4IujEiyNX9gtF273dhxLVX7qmSpD9bPR+jUoH8vNAIUpXn\n6x0Jai/2MQKBgDMMUZc2Reupb9oW+cyolgw9YCpC0kf4a3Xusus69kcODtLb92cj\nMjJpKXrHg8f7ozDVxsMf88k7DCSC8z8Ax9rRTMam50iEoKGf2wlqL7gce53q1pOo\nTO/an+NOgqXkUS+4VfFQtwwVWnlXNpwILzqYryKjSTdaKr9i7aOTdfUBAoGAD8yT\nnsiXHGlkZFMdxMcJY+IZDEYgRVZxvLuzdcbFb7JJ6WrZWAvQmN1Ns+DRAdzgJdf5\nqVqrZTXjLSeyFEqZeUK0WEDrsd/HI8vIsEYthsAKokhVbMODPr6HRVFlkWIDcLo5\npCBCd3AXSqFYfyJh6RM39XCTjk5YPctL5Y9AHcECgYEA7zZDNPihFowuXR0qsjqu\nqt7k0z/0PYmzUTlOLs/a2gok3/Iiah2geze7WzBxeJHj4U96WHze6DWr8z8s7k1Y\nLvLHrVn1e2terpxXCzyrKr+SiZCMADFuiwm0X7nm8mYfpInErTHJIvFCFU14i8l7\ngx52+ZDq+Ap/tv3IZFzIAwk=\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-account@navigo-449807.iam.gserviceaccount.com",
+  "client_id": "105549493680070441143",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-account%40navigo-449807.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
