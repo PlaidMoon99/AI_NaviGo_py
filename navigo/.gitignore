@@ -12,3 +12,6 @@ __pycache__/
 # IDE 및 에디터 설정 파일 무시
 .vscode/
 .idea/
+
+# Google Cloud 서비스 계정 키 파일 무시
+navigo/app/*.json
