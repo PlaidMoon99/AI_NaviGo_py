@@ -21,9 +21,9 @@ async def root():
 # ✅ MySQL 연결 함수
 def get_connection():
     return pymysql.connect(
-        host="192.168.0.6",
-        user="sion",
-        password="00000000",
+        host="localhost",
+        user="root",
+        password="11111111",
         database="navi_go",
         charset="utf8mb4",
         cursorclass=pymysql.cursors.DictCursor

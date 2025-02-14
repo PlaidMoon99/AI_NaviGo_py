@@ -15,7 +15,7 @@ from io import BytesIO
 app = FastAPI()
 
 # Google API 설정
-GOOGLE_API_KEY = "AIzaSyDQSMioENTul2JkcG4ptGdsKTzTyO1corQ"
+GOOGLE_API_KEY = "AIzaSyCk4TLaiqwRtD_vYoGz9mj9Fh22Q6JsYA4"
 gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
 
 # Kakao API 설정
@@ -30,7 +30,7 @@ NAVER_SEARCH_URL = "https://openapi.naver.com/v1/search/local.json"
 NAVER_IMAGE_SEARCH_URL = "https://openapi.naver.com/v1/search/image.json"
 
 # Google Cloud Vision API 설정
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:\\fianlproject2\\vscode\\navigo\\app\\navigo-449807-77dd4d81d05d.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:\\ThisIsJava\\workspace_mid\\vscode\\navigo\\app\\nevigo-1f0e882ebb53.json"
 vision_client = vision.ImageAnnotatorClient()
 
 @app.post("/analyze")
@@ -129,3 +129,8 @@ def is_valid_image_url(url):
     except requests.RequestException:
         return False
 
+
+# ✅ FastAPI 실행
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5000, reload=True)
