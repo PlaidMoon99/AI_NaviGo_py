@@ -1,15 +1,37 @@
-from fastapi import FastAPI, HTTPException
+import time
+from fastapi import FastAPI, HTTPException, Query
 import pymysql
 import pandas as pd
 from rapidfuzz import fuzz
 import unicodedata
 import os
-import math  # NaN 검사용
+import requests
+from typing import List, Optional
+import random
+import urllib.parse
+import json
+from konlpy.tag import Okt
 
 app = FastAPI(docs_url="/docs", openapi_url="/openapi.json")
 
 EXCEL_FILE_PATH = "data/한국관광공사_국문_서비스분류코드_v4.2_gs.xlsx"
 category_data_cache = None
+SERVICE_KEY = "zEp9kLeLZiXElh6mddTl2DXHIl44C4brxSyQojUBO6zjiy25apv9Dvh00sygk%2BKzMuXzMv3zKpoylWiGbVlCLA%3D%3D"
+SERVICE_KEY_DECODE = "zEp9kLeLZiXElh6mddTl2DXHIl44C4brxSyQojUBO6zjiy25apv9Dvh00sygk+KzMuXzMv3zKpoylWiGbVlCLA=="
+
+# KoNLPy의 Okt 인스턴스 생성 (한국어 형태소 분석용)
+okt = Okt()
+
+def extract_keyword_korean(text: str) -> str:
+    """
+    소분류 문자열에서 핵심 명사를 추출하여 반환합니다.
+    예) "일반축제" -> "축제", "야영장,오토캠핑장" -> 둘 중 길이가 긴 명사(또는 첫 번째 명사)
+    """
+    nouns = okt.nouns(text)
+    if nouns:
+        # 가장 긴 명사를 반환 (필요에 따라 다른 기준을 적용할 수 있음)
+        return max(nouns, key=len)
+    return text
 
 def get_connection():
     return pymysql.connect(
@@ -21,42 +43,46 @@ def get_connection():
         cursorclass=pymysql.cursors.DictCursor
     )
 
-async def get_user_preference(member_id):
+async def get_user_preference(member_id: str) -> str:
     connection = get_connection()
-    cursor = connection.cursor()
-    sql = "SELECT prefer_purpose FROM preference WHERE member_id = %s"
-    cursor.execute(sql, (member_id,))
-    result = cursor.fetchone()
-    connection.close()
-    return result["prefer_purpose"] if result else None
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT prefer_purpose FROM preference WHERE member_id = %s"
+            cursor.execute(sql, (member_id,))
+            result = cursor.fetchone()
+            print(f"[User Preference] member_id={member_id}, result={result}")
+            return result["prefer_purpose"] if result else None
+    finally:
+        connection.close()
 
-async def get_user_click_history(member_id):
+async def get_user_click_history(member_id: str) -> List[dict]:
     connection = get_connection()
-    cursor = connection.cursor()
-    # 실제 테이블에서는 'clicked_at' 컬럼으로 되어 있음
-    sql = "SELECT contentid, cat1, cat2, cat3, clicked_at FROM user_activity WHERE memberid = %s"
-    cursor.execute(sql, (member_id,))
-    result = cursor.fetchall()
-    connection.close()
-    return result
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT contentid, cat1, cat2, cat3, title, clicked_at FROM user_activity WHERE memberid = %s"
+            cursor.execute(sql, (member_id,))
+            results = cursor.fetchall()
+            print(f"[Click History] member_id={member_id}, count={len(results)}")
+            return results
+    finally:
+        connection.close()
 
-def load_category_data():
+def load_category_data() -> pd.DataFrame:
     global category_data_cache
     if category_data_cache is not None:
         return category_data_cache
     if not os.path.exists(EXCEL_FILE_PATH):
         raise FileNotFoundError(f"❌ 엑셀 파일이 존재하지 않습니다: {EXCEL_FILE_PATH}")
-    print("🔄 엑셀 파일 로딩 중...")
+    print("Loading Excel file...")
     try:
         xls = pd.ExcelFile(EXCEL_FILE_PATH, engine="openpyxl")
-        available_sheets = xls.sheet_names
-        sheet_name = "시트1" if "시트1" in available_sheets else available_sheets[0]
+        sheet_name = "시트1" if "시트1" in xls.sheet_names else xls.sheet_names[0]
         df = pd.read_excel(xls, sheet_name=sheet_name, dtype=str)
         expected_columns = ["contenttypeid", "cat1", "cat2", "cat3", "대분류", "중분류", "소분류"]
         df.columns = expected_columns[:len(df.columns)]
         df = df.dropna(how="all").reset_index(drop=True)
         df["소분류"] = df["소분류"].astype(str).str.strip()
-        print("✅ [엑셀 로딩 완료] 데이터 개수:", df.shape[0])
+        print(f"Excel loaded: {df.shape[0]} rows")
         category_data_cache = df
         return df
     except Exception as e:
@@ -70,124 +96,156 @@ def deep_normalize(text: str) -> str:
         text = text.replace(ch, "")
     return ''.join(text.split())
 
-def sanitize_rec(rec: dict) -> dict:
-    # NaN (float('nan')) 검사를 통해 NaN인 값은 None으로 치환
-    for k, v in rec.items():
-        if isinstance(v, float) and math.isnan(v):
-            rec[k] = None
-    return rec
+def fetch_travel_destinations_area(cat3: str, exclude_contentids: Optional[List[str]] = None) -> List[dict]:
+    numOfRows = 20
+    api_url = (
+        f"http://apis.data.go.kr/B551011/KorService1/areaBasedList1?"
+        f"serviceKey={SERVICE_KEY}&MobileOS=ETC&MobileApp=AppTest&_type=json"
+        f"&listYN=Y&arrange=Q&numOfRows={numOfRows}&cat3={cat3}"
+    )
+    print(f"[Fetch Area] cat3={cat3}, numOfRows={numOfRows}")
+    response = requests.get(api_url)
+    if response.status_code == 200:
+        try:
+            data = response.json()
+        except Exception as e:
+            print(f"[Fetch Area] JSON parsing error for cat3={cat3}: {e}, response: {response.text}")
+            return []
+        if not isinstance(data, dict):
+            print(f"[Fetch Area] Expected dict but got {type(data)} for cat3={cat3}, data: {data}")
+            return []
+        items = data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
+        if exclude_contentids:
+            items = [item for item in items if item['contentid'] not in exclude_contentids]
+        print(f"[Fetch Area] cat3={cat3}, fetched {len(items)} items")
+        return items
+    print(f"[Fetch Area] Failed to fetch cat3={cat3}, status_code={response.status_code}")
+    return []
 
-def fallback_recommendation(category_data, norm_user_pref):
-    data_copy = category_data.copy()
-    data_copy["소분류_norm"] = data_copy["소분류"].apply(lambda x: deep_normalize(x))
-    data_copy["similarity"] = data_copy["소분류_norm"].apply(lambda x: fuzz.ratio(norm_user_pref, x) if norm_user_pref else 0)
-    print("\n🔎 [Fallback Matching] 결과:")
-    print(data_copy[["cat3", "대분류", "중분류", "소분류", "similarity"]])
-    if not data_copy.empty:
-        best_idx = data_copy["similarity"].idxmax()
-        best_match = data_copy.loc[best_idx]
-        if best_match["similarity"] >= 60:
-            rec = {
-                "cat3": best_match["cat3"],
-                "대분류": best_match["대분류"],
-                "중분류": best_match["중분류"],
-                "소분류": best_match["소분류"],
-                "similarity": float(best_match["similarity"])
-            }
-            rec = sanitize_rec(rec)
-            print(f"🟣 Fallback 추천 결과: {rec}")
-            return rec
-    fallback = category_data.sample(n=min(3, len(category_data)))[["cat3", "대분류", "중분류", "소분류"]].to_dict(orient="records")
-    rec = fallback[0] if fallback else None
-    rec = sanitize_rec(rec) if rec else None
-    print(f"🟣 최종 무작위 fallback 추천: {rec}")
-    return rec
+def fetch_travel_destinations_keyword(subcategory: str, exclude_contentids: Optional[List[str]] = None) -> List[dict]:
+    numOfRows = 20
+    encoded_subcategory = urllib.parse.quote(subcategory, safe="")
+    # arrange 파라미터를 "C"로 설정 (Spring Boot와 동일)
+    api_url = (
+        f"http://apis.data.go.kr/B551011/KorService1/searchKeyword1?"
+        f"serviceKey={SERVICE_KEY}&MobileOS=ETC&MobileApp=AppTest&_type=json"
+        f"&listYN=Y&arrange=C&numOfRows={numOfRows}&keyword={encoded_subcategory}"
+    )
+    print(f"[Fetch Keyword] subcategory={subcategory} (encoded: {encoded_subcategory}), numOfRows={numOfRows}")
+    print("keyword api url: " + api_url)
+    response = requests.get(api_url)
+    if response.status_code == 200:
+        content_type = response.headers.get('Content-Type', '')
+        if 'application/json' not in content_type:
+            print(f"[Fetch Keyword] Unexpected Content-Type: {content_type}. Response: {response.text}")
+            return []
+        try:
+            data = response.json()
+        except Exception as e:
+            print(f"[Fetch Keyword] Error parsing JSON for subcategory={subcategory}: {e}, response: {response.text}")
+            return []
+        if isinstance(data, str):
+            try:
+                data = json.loads(data)
+            except Exception as e:
+                print(f"[Fetch Keyword] Failed to parse string data into dict for subcategory={subcategory}: {e}")
+                return []
+        if not isinstance(data, dict):
+            print(f"[Fetch Keyword] Expected dict but got {type(data)} for subcategory={subcategory}, data: {data}")
+            return []
+        items = data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
+        if exclude_contentids:
+            items = [item for item in items if item['contentid'] not in exclude_contentids]
+        print(f"[Fetch Keyword] subcategory={subcategory}, fetched {len(items)} items")
+        return items
+    print(f"[Fetch Keyword] Failed to fetch subcategory={subcategory}, status_code={response.status_code}")
+    return []
 
-# 추천 로직: 클릭 데이터가 없으면 선호도 기반 추천, 클릭 데이터가 있으면 최신 3건을 기준으로
-# 빈도수 기반 후보를 선정하고, 빈도 tie 시에만 사용자 선호도를 활용하여 tie-break
-async def recommend_best_cat3(member_id):
-    print(f"\n\n✅ 추천 요청된 member_id: {member_id}")
+async def recommend_travel_destinations(member_id: str, exclude_contentids: Optional[List[str]] = None) -> List[dict]:
     user_clicks = await get_user_click_history(member_id)
     user_preference = await get_user_preference(member_id)
-    print(f"🟢 user_preference (소분류 선호): {user_preference}")
-
     category_data = load_category_data()
-    norm_user_pref = deep_normalize(user_preference) if user_preference else None
-    print(f"🔍 정규화된 사용자 선호도: {norm_user_pref}")
 
-    import pandas as pd
-    # 클릭 데이터가 없으면 선호도 기반 fallback 추천 사용
     if not user_clicks:
-        print("클릭 데이터가 없으므로 선호도 기반 추천 진행")
-        return fallback_recommendation(category_data, norm_user_pref)
-
-    # 클릭 데이터가 있을 때: 최신 3건 추출 (clicked_at 기준)
-    clicks_df = pd.DataFrame(user_clicks)
-    if "clicked_at" in clicks_df.columns:
+        norm_user_pref = deep_normalize(user_preference) if user_preference else ""
+        category_data["소분류_norm"] = category_data["소분류"].apply(deep_normalize)
+        category_data["similarity"] = category_data["소분류_norm"].apply(lambda x: fuzz.ratio(norm_user_pref, x))
+        top_cat3 = category_data.nlargest(5, 'similarity')['cat3'].tolist()
+        print(f"[No Clicks] Top cat3 based on similarity: {top_cat3}")
+    else:
+        clicks_df = pd.DataFrame(user_clicks)
         clicks_df["clicked_at"] = pd.to_datetime(clicks_df["clicked_at"])
         clicks_df = clicks_df.sort_values(by="clicked_at", ascending=False)
-        latest_clicks = clicks_df.head(3)
-    else:
-        latest_clicks = clicks_df
+        clicks_df['weight'] = clicks_df['clicked_at'].rank(ascending=False).apply(lambda x: 0.9 ** (x - 1))
+        cat3_weights = clicks_df.groupby('cat3')['weight'].sum().reset_index()
 
-    if latest_clicks.empty:
-        return fallback_recommendation(category_data, norm_user_pref)
-
-    # Step 1: 최신 클릭 기록에서 cat3 빈도수 계산
-    freq = latest_clicks["cat3"].value_counts()
-    print("클릭 기록 빈도수:\n", freq)
-    if freq.empty:
-        return fallback_recommendation(category_data, norm_user_pref)
-    
-    # 빈도수가 유일하면 그 후보 사용
-    if len(freq) == 1:
-        selected_candidate = freq.index[0]
-        print(f"유일한 후보: {selected_candidate}")
-    else:
-        max_freq = freq.max()
-        candidate_list = freq[freq == max_freq].index.tolist()
-        print(f"빈도 tie 후보들: {candidate_list}")
-        # Tie-break: 후보 목록 중, tie 상황에서는 사용자 선호도와 일치하는 후보 우선
-        if len(candidate_list) > 1:
-            category_data["소분류_norm"] = category_data["소분류"].apply(lambda x: deep_normalize(x))
-            category_data["pref_similarity"] = category_data["소분류_norm"].apply(lambda x: fuzz.ratio(norm_user_pref, x) if norm_user_pref else 0)
-            best_idx_pref = category_data["pref_similarity"].idxmax()
-            preferred_cat3 = category_data.loc[best_idx_pref, "cat3"]
-            print(f"선호도 기반 추천 cat3: {preferred_cat3}")
-            if preferred_cat3 in candidate_list:
-                selected_candidate = preferred_cat3
-                print(f"선호도 기반 후보 {preferred_cat3} 선택 (tie-break)")
-            else:
-                # tie 후보들 중 추가 기준 없이 후보별 소분류 유사도 최대값을 비교하여 선택
-                candidate_scores = {}
-                for candidate in candidate_list:
-                    candidate_df = category_data[category_data["cat3"] == candidate].copy()
-                    candidate_df["소분류_norm"] = candidate_df["소분류"].apply(lambda x: deep_normalize(x))
-                    candidate_scores[candidate] = candidate_df["소분류_norm"].apply(lambda x: fuzz.ratio(norm_user_pref, x)).max() if not candidate_df.empty else 0
-                    print(f"Candidate {candidate} 유사도: {candidate_scores[candidate]}")
-                selected_candidate = max(candidate_scores, key=candidate_scores.get)
-                print(f"최종 tie-break 후보: {selected_candidate}")
+        if user_preference:
+            norm_user_pref = deep_normalize(user_preference)
+            category_data["소분류_norm"] = category_data["소분류"].apply(deep_normalize)
+            category_data["pref_similarity"] = category_data["소분류_norm"].apply(lambda x: fuzz.ratio(norm_user_pref, x))
+            cat3_weights = cat3_weights.merge(category_data[['cat3', 'pref_similarity']], on='cat3', how='left')
+            cat3_weights['pref_similarity'] = cat3_weights['pref_similarity'].fillna(0)
+            cat3_weights['score'] = cat3_weights['weight'] + cat3_weights['pref_similarity'] / 100
         else:
-            selected_candidate = candidate_list[0]
-            print(f"유일 후보 선택: {selected_candidate}")
+            cat3_weights['score'] = cat3_weights['weight']
 
-    # Step 2: 선택된 후보에 해당하는 Excel 데이터에서 해당 cat3 정보를 그대로 추천
-    candidate_df = category_data[category_data["cat3"] == selected_candidate].copy()
-    if not candidate_df.empty:
-        rec = candidate_df.iloc[0].to_dict()
-        rec["source"] = "click 기반 추천"
-        rec = sanitize_rec(rec)
-        print(f"🟣 최종 추천 결과 (클릭 데이터 기반): {rec}")
-        return rec
+        clicked_titles = clicks_df['title'].unique().tolist()
+        norm_clicked_titles = [deep_normalize(title) for title in clicked_titles]
+        category_data["title_similarity"] = category_data["소분류"].apply(
+            lambda x: max([fuzz.ratio(deep_normalize(x), norm_title) for norm_title in norm_clicked_titles], default=0)
+        )
+        cat3_title_similarity = category_data.groupby('cat3')['title_similarity'].mean().reset_index()
+        cat3_weights = cat3_weights.merge(cat3_title_similarity, on='cat3', how='left')
+        cat3_weights['score'] = cat3_weights['score'] + cat3_weights['title_similarity'] / 100
 
-    return fallback_recommendation(category_data, norm_user_pref)
+        top_cat3 = cat3_weights.nlargest(5, 'score')['cat3'].tolist()
+        print(f"[With Clicks] Top cat3 based on combined score: {top_cat3}")
+
+    # 생성된 Excel DataFrame에서 cat3 -> 소분류 매핑 생성
+    mapping = category_data.set_index("cat3")["소분류"].to_dict()
+
+    travel_destinations = []
+    for cat3 in top_cat3:
+        # area API는 cat3 코드를 그대로 사용
+        items_area = fetch_travel_destinations_area(cat3, exclude_contentids)
+        travel_destinations.extend(items_area)
+        # 키워드 API는 소분류(실제 한국어 키워드)를 사용.
+        subcategory = mapping.get(cat3, cat3)
+        # 만약 소분류 값에 쉼표가 있다면 첫 번째 항목만 사용
+        if ',' in subcategory:
+            subcategory = subcategory.split(',')[0].strip()
+        # KoNLPy를 사용해 소분류에서 핵심 명사를 추출
+        refined_subcategory = extract_keyword_korean(subcategory)
+        items_keyword = fetch_travel_destinations_keyword(refined_subcategory, exclude_contentids)
+        travel_destinations.extend(items_keyword)
+        print(f"[For cat3 {cat3}] area items: {len(items_area)}, keyword items (for refined subcategory '{refined_subcategory}'): {len(items_keyword)}")
+
+    unique_destinations = {item['contentid']: item for item in travel_destinations}.values()
+    unique_destinations = list(unique_destinations)
+    print(f"Total unique recommendations before shuffling: {len(unique_destinations)}")
+    return unique_destinations
 
 @app.get("/recommend/{member_id}")
-async def get_recommendations(member_id: str):
-    recommendation = await recommend_best_cat3(member_id)
-    if not recommendation:
+async def get_recommendations(member_id: str,
+                              exclude: Optional[str] = None,
+                              page: int = Query(1, ge=1),
+                              refresh: Optional[bool] = Query(False),
+                              seed: Optional[int] = Query(None)):
+    exclude_contentids = exclude.split(',') if exclude else None
+    recommendations = await recommend_travel_destinations(member_id, exclude_contentids)
+    if not recommendations:
         raise HTTPException(status_code=404, detail="No recommendations found")
-    return recommendation
+    per_page = 3
+    if refresh or seed is None:
+        seed = int(time.time() * 1000)
+    print(f"Total recommendations: {len(recommendations)} before shuffling")
+    rnd = random.Random(seed)
+    rnd.shuffle(recommendations)
+    start = (page - 1) * per_page
+    end = start + per_page
+    paged_recommendations = recommendations[start:end]
+    print(f"Returning page {page} with seed {seed} and {len(paged_recommendations)} recommendations")
+    return {"seed": seed, "page": page, "recommendations": paged_recommendations}
 
 if __name__ == "__main__":
     import uvicorn

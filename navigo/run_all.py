@@ -10,6 +10,7 @@ servers = [
     ["uvicorn", "navigoPrefer:app", "--host", "127.0.0.1", "--port", "5000", "--reload"],  # FastAPI 실행
     [venv_python, "gemini_flask.py"],  # Flask 실행
     ["uvicorn", "image:app", "--host", "127.0.0.1", "--port", "8000", "--reload"],  # image.py를 FastAPI로 실행
+    ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "7373", "--reload"]
 ]
 
 
