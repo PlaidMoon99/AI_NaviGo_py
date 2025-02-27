@@ -1,0 +1,12 @@
+# 기존 내용
+config.py
+__pycache__/
+.env
+
+# JSON 파일 무시 설정 추가
+app/*.json
+
+# 가상 환경(venv) 무시
+navigo/venv/
+.venv/
+venv

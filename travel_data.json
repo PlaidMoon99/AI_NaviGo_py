@@ -1,0 +1,472 @@
+{
+  "summary": {
+    "main_attractions": [
+      "우피치 미술관",
+      "베키오 다리",
+      "미켈란젤로 광장",
+      "산타 마리아 노벨라 성당",
+      "보볼리 정원",
+      "피렌체 시내 관광"
+    ],
+    "route_overview": "피렌체의 주요 명소를 중심으로, 미술관, 다리, 광장, 성당, 정원 등을 방문하며 피렌체의 역사와 문화를 체험하는 여정입니다. 도보 이동을 기본으로 하며, 필요에 따라 대중교통을 이용합니다."
+  },
+  "daily_schedule": [
+    {
+      "day": 1,
+      "date": "2025-03-01",
+      "activities": [
+        {
+          "type": "hotel",
+          "time": "15:00",
+          "place": "더 웨스틴 엑셀시오",
+          "duration": "30",
+          "notes": "호텔 체크인 및 짐 정리",
+          "location": {
+            "type": "hotel",
+            "lat": 43.7719285,
+            "lng": 11.2458883
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "16:00",
+          "place": "산타 마리아 노벨라 성당",
+          "duration": "120",
+          "notes": "산타 마리아 노벨라 성당 방문 및 내부 관람",
+          "location": {
+            "type": "attraction",
+            "lat": 43.77463460000001,
+            "lng": 11.2493859
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "18:30",
+          "place": "Trattoria Mario",
+          "duration": "90",
+          "notes": "저녁 식사 (피렌체 전통 음식)",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.7765605,
+            "lng": 11.2545811
+          }
+        }
+      ],
+      "total_distance": 1
+    },
+    {
+      "day": 2,
+      "date": "2025-03-02",
+      "activities": [
+        {
+          "type": "attraction",
+          "time": "10:00",
+          "place": "우피치 미술관",
+          "duration": "120",
+          "notes": "우피치 미술관 방문 및 주요 작품 감상 (사전 예약 필수)",
+          "location": {
+            "type": "attraction",
+            "lat": 43.7677856,
+            "lng": 11.2553108
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "12:30",
+          "place": "Eataly Firenze",
+          "duration": "90",
+          "notes": "점심 식사 (이탈리아 음식)",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.77411410000001,
+            "lng": 11.2557072
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "14:30",
+          "place": "베키오 다리",
+          "duration": "60",
+          "notes": "베키오 다리 방문 एवं 상점 구경",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.76792500000001,
+            "lng": 11.2531435
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "16:00",
+          "place": "보볼리 정원",
+          "duration": "60",
+          "notes": "보볼리 정원 산책 및 휴식",
+          "location": {
+            "type": "attraction",
+            "lat": 43.76249719999999,
+            "lng": 11.2483996
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "18:30",
+          "place": "피싱랩",
+          "duration": "90",
+          "notes": "저녁 식사 (해산물 요리)",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.770965,
+            "lng": 11.257946
+          }
+        }
+      ],
+      "total_distance": 3
+    },
+    {
+      "day": 3,
+      "date": "2025-03-03",
+      "activities": [
+        {
+          "type": "attraction",
+          "time": "10:00",
+          "place": "미켈란젤로 광장",
+          "duration": "60",
+          "notes": "미켈란젤로 광장 방문 및 피렌체 시내 전경 감상",
+          "location": {
+            "type": "attraction",
+            "lat": 43.7629314,
+            "lng": 11.2650561
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "11:30",
+          "place": "Porta San Niccolò",
+          "duration": "60",
+          "notes": "Porta San Niccolò 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.7645484,
+            "lng": 11.2649262
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "12:30",
+          "place": "부카마리오",
+          "duration": "90",
+          "notes": "점심 식사 (해산물 요리)",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.77231270000001,
+            "lng": 11.2491965
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "14:30",
+          "place": "산 조반니 바티스타 교회",
+          "duration": "60",
+          "notes": "산 조반니 바티스타 교회 방문 및 내부 관람",
+          "location": {
+            "type": "attraction",
+            "lat": 43.8314784,
+            "lng": 11.1571064
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "16:00",
+          "place": "헤라클레스와 카쿠스",
+          "duration": "60",
+          "notes": "헤라클레스와 카쿠스 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.76920030000001,
+            "lng": 11.2558834
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "18:30",
+          "place": "Ristorante Trattoria da Burde",
+          "duration": "90",
+          "notes": "저녁 식사 (피렌체 전통 음식)",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.7941421,
+            "lng": 11.1858446
+          }
+        }
+      ],
+      "total_distance": 5
+    },
+    {
+      "day": 4,
+      "date": "2025-03-04",
+      "activities": [
+        {
+          "type": "attraction",
+          "time": "10:00",
+          "place": "산타 마리아 마조레 성당",
+          "duration": "60",
+          "notes": "산타 마리아 마조레 성당 방문 및 내부 관람",
+          "location": {
+            "type": "attraction",
+            "lat": 43.77326139999999,
+            "lng": 11.2530231
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "11:30",
+          "place": "Palazzo Guicciardini",
+          "duration": "60",
+          "notes": "Palazzo Guicciardini 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.76652559999999,
+            "lng": 11.2511105
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "12:30",
+          "place": "Pizzeria Orto Del Cigno",
+          "duration": "90",
+          "notes": "점심 식사(피자)",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.76474529999999,
+            "lng": 11.3013756
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "14:30",
+          "place": "Parco delle Cascine",
+          "duration": "60",
+          "notes": "Parco delle Cascine 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.78281130000001,
+            "lng": 11.2169114
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "16:00",
+          "place": "Porta al Prato",
+          "duration": "60",
+          "notes": "Porta al Prato 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.77795010000001,
+            "lng": 11.2399551
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "18:30",
+          "place": "Ristorante Pizzeria ZeroZero 00",
+          "duration": "90",
+          "notes": "저녁 식사 (피자)",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.7879814,
+            "lng": 11.2446649
+          }
+        }
+      ],
+      "total_distance": 4
+    },
+    {
+      "day": 5,
+      "date": "2025-03-05",
+      "activities": [
+        {
+          "type": "attraction",
+          "time": "10:00",
+          "place": "Walls of Florence",
+          "duration": "60",
+          "notes": "Walls of Florence 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.7632161,
+            "lng": 11.2595312
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "11:30",
+          "place": "Fountain of the Artichoke",
+          "duration": "60",
+          "notes": "Fountain of the Artichoke 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.7646547,
+            "lng": 11.2504654
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "12:30",
+          "place": "Rifrullo Firenze",
+          "duration": "90",
+          "notes": "점심 식사",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.7641771,
+            "lng": 11.2615872
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "14:30",
+          "place": "Abbey of San Martino in Campo",
+          "duration": "60",
+          "notes": "Abbey of San Martino in Campo 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.7791546,
+            "lng": 11.020488
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "16:00",
+          "place": "Porta San Giorgio",
+          "duration": "60",
+          "notes": "Porta San Giorgio 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.7629188,
+            "lng": 11.2549433
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "18:30",
+          "place": "Pizzaman",
+          "duration": "90",
+          "notes": "저녁 식사 (피자)",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.7741114,
+            "lng": 11.2223194
+          }
+        }
+      ],
+      "total_distance": 6
+    },
+    {
+      "day": 6,
+      "date": "2025-03-06",
+      "activities": [
+        {
+          "type": "attraction",
+          "time": "10:00",
+          "place": "Pieve di San Donato in Poggio",
+          "duration": "60",
+          "notes": "Pieve di San Donato in Poggio 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.53748889999999,
+            "lng": 11.2360319
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "11:30",
+          "place": "Judith and Holofernes",
+          "duration": "60",
+          "notes": "Judith and Holofernes 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.7695085,
+            "lng": 11.2559773
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "12:30",
+          "place": "Osteria Tripperia Il Magazzino",
+          "duration": "90",
+          "notes": "점심 식사",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.7672232,
+            "lng": 11.2503629
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "14:30",
+          "place": "Statua Daniele Manin",
+          "duration": "60",
+          "notes": "Statua Daniele Manin 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.75557320000001,
+            "lng": 11.2503023
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "16:00",
+          "place": "The Cavalciotto of Saint Lucia",
+          "duration": "60",
+          "notes": "The Cavalciotto of Saint Lucia 방문",
+          "location": {
+            "type": "attraction",
+            "lat": 43.90718859999999,
+            "lng": 11.1169614
+          }
+        },
+        {
+          "type": "restaurant",
+          "time": "18:30",
+          "place": "Le Carceri",
+          "duration": "90",
+          "notes": "저녁 식사",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.76893,
+            "lng": 11.268557
+          }
+        }
+      ],
+      "total_distance": 7
+    },
+    {
+      "day": 7,
+      "date": "2025-03-07",
+      "activities": [
+        {
+          "type": "hotel",
+          "time": "11:00",
+          "place": "더 웨스틴 엑셀시오",
+          "duration": "30",
+          "notes": "호텔 체크아웃",
+          "location": {
+            "type": "hotel",
+            "lat": 43.7719285,
+            "lng": 11.2458883
+          }
+        },
+        {
+          "type": "attraction",
+          "time": "11:30",
+          "place": "Caffè Gilli",
+          "duration": "60",
+          "notes": "Caffè Gilli 방문",
+          "location": {
+            "type": "restaurant",
+            "lat": 43.7718814,
+            "lng": 11.2541517
+          }
+        }
+      ],
+      "total_distance": 0.5
+    }
+  ]
+}
